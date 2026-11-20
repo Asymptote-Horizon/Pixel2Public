@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#101318" />
+<title>Pixel2Public — Outdoor Reality Studio</title>
+<style>
+  :root{
+    --bg:#101318;--bg2:#151a21;--panel:#1a2029;--panel2:#202833;--panel3:#252f3b;
+    --line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.13);--text:#f2f4f6;
+    --muted:#9aa5b2;--soft:#707d8b;--lime:#c5ef67;--lime2:#d9f39c;--cyan:#78c8d2;
+    --amber:#eeb86a;--red:#f08b80;--blue:#85a9e9;--shadow:0 20px 60px rgba(0,0,0,.24);
+    --radius:17px;--radius-sm:11px;--font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;min-height:100vh}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+  .app-shell{max-width:1680px;margin:0 auto;min-height:100vh}
+  .topbar{height:76px;padding:0 30px;display:flex;align-items:center;gap:34px;border-bottom:1px solid var(--line);background:rgba(16,19,24,.92);position:sticky;top:0;z-index:30;backdrop-filter:blur(16px)}
+  .brand{display:flex;align-items:center;gap:11px;min-width:242px}
+  .brand-mark{width:38px;height:38px;border-radius:12px;background:var(--lime);color:#172018;display:grid;place-items:center;font-weight:900;letter-spacing:-1px;font-size:13px;box-shadow:0 7px 24px rgba(197,239,103,.14)}
+  .brand-name{font-size:16px;letter-spacing:-.55px;font-weight:760;line-height:1.15}.brand-name span{color:var(--lime)}
+  .brand-sub{font-size:9px;color:var(--soft);letter-spacing:1.28px;text-transform:uppercase;margin-top:4px;font-weight:700}
+  .main-nav{display:flex;align-items:center;gap:5px;height:100%;flex:1}
+  .nav-btn{height:42px;border:0;background:transparent;color:var(--muted);padding:0 14px;border-radius:10px;font-size:12px;font-weight:650;transition:.2s}
+  .nav-btn:hover{color:var(--text);background:rgba(255,255,255,.045)}
+  .nav-btn.active{color:var(--lime);background:rgba(197,239,103,.09)}
+  .top-actions{display:flex;align-items:center;gap:10px}
+  .demo-status{border:1px solid rgba(197,239,103,.22);background:rgba(197,239,103,.07);color:var(--lime2);font-size:10px;letter-spacing:.5px;padding:7px 10px;border-radius:100px;white-space:nowrap}
+  .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lime);margin-right:6px;vertical-align:1px;box-shadow:0 0 9px rgba(197,239,103,.55)}
+  .btn{border:1px solid var(--line2);border-radius:10px;background:var(--panel2);color:var(--text);padding:10px 14px;font-size:12px;font-weight:700;transition:transform .18s,border-color .18s,background .18s}
+  .btn:hover{transform:translateY(-1px);border-color:rgba(197,239,103,.4);background:#293440}
+  .btn-primary{background:var(--lime);color:#171c16;border-color:var(--lime);box-shadow:0 7px 20px rgba(197,239,103,.11)}
+  .btn-primary:hover{background:#d5f58c;border-color:#d5f58c}
+  .btn-quiet{background:transparent;border-color:var(--line);color:var(--muted)}
+  .btn-small{padding:7px 10px;font-size:11px}
+  .mobile-menu{display:none}
+  .content{padding:29px 30px 58px}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:22px}
+  .eyebrow{font-size:10px;text-transform:uppercase;color:var(--lime);font-weight:800;letter-spacing:1.5px;margin-bottom:8px}
+  h1,h2,h3,p{margin-top:0}
+  .page-head h1{font-size:clamp(25px,3vw,35px);line-height:1.12;letter-spacing:-1.3px;margin:0 0 8px;font-weight:760}
+  .page-head p{margin:0;color:var(--muted);font-size:13px;max-width:720px}
+  .head-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+  .meta-pill{border:1px solid var(--line);padding:8px 11px;border-radius:9px;font-size:10px;color:var(--muted);white-space:nowrap;background:rgba(255,255,255,.018)}
+  .meta-pill strong{color:var(--text);font-weight:700}
+  .layout-studio{display:grid;grid-template-columns:264px minmax(420px,1fr) 286px;gap:15px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-width:0}
+  .panel-head{padding:16px 17px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .panel-title{font-size:12px;font-weight:750;letter-spacing:.1px}
+  .panel-kicker{font-size:9px;color:var(--soft);text-transform:uppercase;letter-spacing:1px;font-weight:800}
+  .panel-body{padding:15px 16px}
+  .step-label{display:flex;align-items:center;gap:8px;font-weight:750;font-size:11px;margin-bottom:10px;color:#e9edf1}
+  .step-no{width:20px;height:20px;background:rgba(197,239,103,.12);border:1px solid rgba(197,239,103,.22);display:grid;place-items:center;border-radius:7px;color:var(--lime);font-size:10px;font-weight:800}
+  .upload-zone{border:1px dashed rgba(197,239,103,.35);border-radius:12px;padding:17px 12px;text-align:center;background:linear-gradient(140deg,rgba(197,239,103,.055),rgba(197,239,103,.015));transition:.2s;cursor:pointer}
+  .upload-zone.drag{background:rgba(197,239,103,.13);border-color:var(--lime)}
+  .upload-icon{width:32px;height:32px;margin:0 auto 8px;border-radius:10px;background:rgba(197,239,103,.13);display:grid;place-items:center;color:var(--lime);font-size:16px}
+  .upload-zone strong{display:block;font-size:11px;margin-bottom:3px}.upload-zone span{color:var(--soft);font-size:9px}
+  .file-name{margin-top:8px;color:var(--lime2);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .divider-label{display:flex;align-items:center;gap:9px;color:var(--soft);font-size:9px;text-transform:uppercase;font-weight:800;letter-spacing:1px;margin:14px 0 9px}
+  .divider-label:before,.divider-label:after{content:"";height:1px;background:var(--line);flex:1}
+  .sample-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .sample-card{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#202833;padding:0;color:var(--muted);text-align:left;transition:.18s;min-width:0}
+  .sample-card:hover,.sample-card.active{border-color:rgba(197,239,103,.6);color:var(--text);transform:translateY(-1px)}
+  .sample-art{height:52px;display:block;overflow:hidden}.sample-art svg{width:100%;height:100%;display:block}
+  .sample-card span{display:block;padding:6px 6px 7px;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .field{margin-top:15px}.field label{display:block;font-size:10px;font-weight:700;color:#d9dfe5;margin-bottom:7px}
+  .select{width:100%;height:39px;padding:0 11px;background:#11161d;color:var(--text);border:1px solid var(--line2);border-radius:9px;font-size:11px}
+  .site-hint{font-size:9px;color:var(--soft);margin-top:6px;line-height:1.45}
+  .control-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:16px}
+  .control-row label{font-size:10px;font-weight:700;color:#dbe0e5}.control-row small{font-size:9px;color:var(--lime2);font-weight:700}
+  input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer;height:4px;margin:10px 0 2px}
+  .preset-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .chip{border:1px solid var(--line);background:#151b23;color:var(--muted);padding:5px 8px;border-radius:7px;font-size:9px;font-weight:700}
+  .chip:hover,.chip.active{color:var(--lime2);border-color:rgba(197,239,103,.4);background:rgba(197,239,103,.07)}
+  .camera-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+  .camera-btn{background:#151b23;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:7px 5px;font-size:9px;font-weight:700}
+  .camera-btn.active{color:var(--lime2);border-color:rgba(197,239,103,.4);background:rgba(197,239,103,.075)}
+  .scene-panel{padding:0}
+  .scene-top{height:57px;padding:0 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+  .scene-label{display:flex;align-items:center;gap:9px;min-width:0}.scene-label strong{font-size:11px}.scene-label span{font-size:9px;color:var(--soft)}
+  .live-tag{font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--lime);border:1px solid rgba(197,239,103,.24);background:rgba(197,239,103,.055);padding:5px 7px;border-radius:6px;white-space:nowrap}
+  .scene-stage{position:relative;background:#19222a;overflow:hidden;aspect-ratio:1.55;min-height:330px;max-height:510px}
+  #sceneSvg{width:100%;height:100%;display:block}
+  .scene-overlay{position:absolute;left:13px;top:13px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+  .scene-overlay span{font-size:8px;letter-spacing:.7px;font-weight:800;padding:5px 7px;border-radius:5px;background:rgba(12,17,22,.64);border:1px solid rgba(255,255,255,.13);color:#e4e9ec;backdrop-filter:blur(7px)}
+  .scene-overlay .accent{color:var(--lime);border-color:rgba(197,239,103,.28)}
+  .scene-caption{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;background:#171d25;border-top:1px solid var(--line);font-size:9px;color:var(--soft)}
+  .scene-caption strong{color:#cfd6dc;font-weight:650}
+  .env-dock{padding:14px 16px 15px;display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid var(--line)}
+  .env-title{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;font-weight:750}.env-title em{font-style:normal;color:var(--lime2);font-size:9px;font-weight:700}
+  .env-scale{display:flex;justify-content:space-between;font-size:8px;color:var(--soft);margin-top:4px}
+  .run-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#151b23;border-top:1px solid var(--line)}
+  .run-note{font-size:9px;color:var(--soft);line-height:1.35}.run-note strong{color:#dfe4e8}
+  .run-btn{min-width:154px}
+  .score-intro{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+  .score-wrap{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .score-card{background:#151b23;border:1px solid var(--line);border-radius:12px;padding:12px 7px 10px;text-align:center}
+  .ring{width:70px;height:70px;display:block;margin:0 auto 5px}
+  .ring-bg{fill:none;stroke:#2d3742;stroke-width:7}.ring-fg{fill:none;stroke:var(--lime);stroke-width:7;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .45s}
+  .ring-value{font-size:17px;font-weight:800;fill:#f3f5f6}.score-name{font-size:9px;color:var(--muted);font-weight:700}
+  .score-card small{display:block;font-size:8px;color:var(--soft);margin-top:4px}
+  .subhead{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--soft);font-weight:800;margin:17px 0 10px}
+  .bar-item{margin-bottom:11px}.bar-meta{display:flex;justify-content:space-between;gap:7px;font-size:9px;margin-bottom:5px}.bar-meta span:first-child{color:#c9d0d6}.bar-meta span:last-child{color:var(--muted);font-weight:700}
+  .bar-track{height:5px;border-radius:9px;background:#2b3540;overflow:hidden}.bar-fill{height:100%;border-radius:9px;background:linear-gradient(90deg,#88bf54,var(--lime));width:70%;transition:width .35s}
+  .insight{background:rgba(197,239,103,.055);border:1px solid rgba(197,239,103,.17);border-radius:11px;padding:11px;margin-top:16px}
+  .insight-title{font-size:9px;color:var(--lime);font-weight:800;letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}.insight p{font-size:10px;color:#c7d0d6;line-height:1.5;margin:0}
+  .method-note{font-size:8px;color:var(--soft);line-height:1.45;margin-top:12px}
+  .tab-page{display:none}.tab-page.active{display:block;animation:fadeIn .28s ease}
+  @keyframes fadeIn{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .section-title{font-size:17px;letter-spacing:-.4px;margin:0 0 5px}.section-sub{font-size:11px;color:var(--muted);margin:0}
+  .location-layout{display:grid;grid-template-columns:minmax(420px,1.3fr) minmax(300px,.8fr);gap:16px;margin-top:20px}
+  .map-card{padding:0;min-height:520px}.map-head{padding:16px 18px;display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line)}
+  .schematic-map{height:450px;position:relative;overflow:hidden;background:#171f27}
+  .schematic-map svg{width:100%;height:100%;display:block}
+  .map-legend{position:absolute;left:14px;bottom:13px;background:rgba(13,18,23,.82);border:1px solid var(--line2);border-radius:9px;padding:8px 10px;color:var(--muted);font-size:9px;backdrop-filter:blur(8px)}
+  .map-legend i{display:inline-block;width:7px;height:7px;background:var(--lime);border-radius:50%;margin:0 5px 0 8px}.map-legend i:first-child{margin-left:0}
+  .zone-list{display:flex;flex-direction:column;gap:9px}
+  .zone-card{display:grid;grid-template-columns:38px 1fr auto;gap:11px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:12px;border-radius:12px;transition:.18s}
+  .zone-card:hover,.zone-card.selected{border-color:rgba(197,239,103,.4);background:#1e2730}
+  .zone-icon{width:36px;height:36px;border-radius:10px;background:#2c3741;color:var(--lime);display:grid;place-items:center;font-size:14px}
+  .zone-card strong{font-size:11px;display:block}.zone-card span{display:block;color:var(--soft);font-size:9px;margin-top:3px}
+  .zone-card button{font-size:9px;border:1px solid var(--line);background:#151b23;color:var(--lime2);border-radius:7px;padding:7px 8px;font-weight:750}
+  .advisor-card{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .advisor-card h3{font-size:13px;margin:0 0 5px}.advisor-card p{font-size:10px;color:var(--muted);margin:0 0 13px;line-height:1.5}
+  .advisor-controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}.advisor-controls .field{margin:0}.advisor-controls label{font-size:9px}.recommendation{display:none;margin-top:13px;padding:12px;border-radius:10px;background:rgba(197,239,103,.07);border:1px solid rgba(197,239,103,.2)}.recommendation.show{display:block}.recommendation strong{font-size:11px;color:var(--lime2)}.recommendation p{font-size:9px;color:#c7d0d6;margin:4px 0 0}
+  .analytics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:19px 0 16px}
+  .metric-card{padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:13px}
+  .metric-card span{display:block;color:var(--soft);font-size:9px;text-transform:uppercase;letter-spacing:.8px;font-weight:800}.metric-card strong{display:block;font-size:21px;letter-spacing:-.8px;margin:5px 0 3px}.metric-card small{font-size:9px;color:var(--muted)}
+  .analytics-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:15px;align-items:start}
+  .chart-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:17px;min-width:0}
+  .chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}.chart-head h3{font-size:12px;margin:0 0 4px}.chart-head p{font-size:9px;color:var(--soft);margin:0}
+  .chart-svg{width:100%;height:auto;display:block;overflow:visible}
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.calc-field{background:#151b23;border:1px solid var(--line);border-radius:10px;padding:11px}.calc-field label{display:block;color:var(--muted);font-size:9px;font-weight:700;margin-bottom:7px}.calc-field input{width:100%;background:transparent;border:0;color:var(--text);font-size:16px;font-weight:800;outline:none;min-width:0}.calc-field input:focus{outline:none}.calc-field span{font-size:8px;color:var(--soft)}
+  .savings-result{margin-top:12px;padding:14px;background:rgba(197,239,103,.07);border:1px solid rgba(197,239,103,.22);border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}.savings-result span{font-size:9px;color:var(--muted)}.savings-result strong{font-size:22px;letter-spacing:-.6px;color:var(--lime2)}
+  .finance-table{width:100%;border-collapse:collapse;font-size:9px;margin-top:8px}.finance-table th{text-align:right;color:var(--soft);font-size:8px;text-transform:uppercase;letter-spacing:.6px;padding:9px 7px;border-bottom:1px solid var(--line)}.finance-table th:first-child,.finance-table td:first-child{text-align:left}.finance-table td{text-align:right;padding:9px 7px;border-bottom:1px solid rgba(255,255,255,.045);color:#cfd5da;font-variant-numeric:tabular-nums}.finance-table tr:last-child td{border-bottom:0;font-weight:800;color:var(--lime2)}.finance-table-wrap{overflow-x:auto}
+  .finance-notes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.note-tile{background:#151b23;border:1px solid var(--line);border-radius:10px;padding:12px}.note-tile strong{font-size:10px;display:block;margin-bottom:3px}.note-tile span{font-size:9px;color:var(--muted);line-height:1.45;display:block}
+  .pitch-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.pitch-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px}.pitch-card h3{font-size:14px;margin:0 0 8px}.pitch-card p{font-size:11px;color:var(--muted);line-height:1.6}.pitch-quote{border-left:2px solid var(--lime);padding:4px 0 4px 14px;color:#e3e8ed;font-size:12px;line-height:1.7}.pitch-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.pitch-meta span{border:1px solid var(--line);border-radius:7px;padding:6px 8px;color:var(--muted);font-size:9px}
+  .timeline{display:grid;gap:11px;margin-top:15px}.timeline-row{display:grid;grid-template-columns:57px 1fr;gap:10px}.timeline-row b{color:var(--lime);font-size:9px;padding-top:2px}.timeline-row p{font-size:10px;color:#c9d0d6;margin:0;line-height:1.55}
+  .footnote{color:var(--soft);font-size:9px;line-height:1.5;margin-top:14px}
+  .footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:26px;padding-top:15px;color:var(--soft);font-size:9px}
+  .modal-backdrop{position:fixed;inset:0;z-index:80;background:rgba(4,7,10,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-backdrop.show{display:flex}.modal{width:min(690px,100%);max-height:88vh;overflow:auto;background:#1b222b;border:1px solid var(--line2);border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.5)}
+  .modal-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h3{font-size:14px;margin:0}.close-btn{border:0;color:var(--muted);background:transparent;font-size:22px;line-height:1}
+  .modal-body{padding:19px 20px;color:#cbd2d9;font-size:11px;line-height:1.65}.script-segment{padding:11px 13px;border-left:2px solid var(--lime);background:#151b23;border-radius:0 9px 9px 0;margin-bottom:9px}.script-segment b{display:block;color:var(--lime);font-size:9px;margin-bottom:4px;letter-spacing:.4px}.modal-actions{padding:13px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+  .toast{position:fixed;right:22px;bottom:22px;z-index:100;background:#27313a;color:#f4f6f7;border:1px solid rgba(197,239,103,.3);padding:11px 14px;border-radius:10px;box-shadow:0 12px 35px rgba(0,0,0,.35);font-size:11px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;max-width:min(340px,calc(100vw - 40px))}.toast.show{opacity:1;transform:none}
+  .hidden{display:none!important}
+  @media(max-width:1250px){.layout-studio{grid-template-columns:245px minmax(360px,1fr)}.right-panel{grid-column:1/-1;display:grid;grid-template-columns:250px 1fr;align-items:start}.right-panel .panel-head{grid-column:1/-1}.right-panel .panel-body{display:grid;grid-template-columns:270px 1fr;gap:16px}.right-panel .score-wrap{align-self:start}.right-panel .subhead{margin-top:2px}.right-panel .insight{margin-top:0}.right-panel .method-note{grid-column:1/-1}}
+  @media(max-width:900px){.topbar{padding:0 17px;gap:15px}.brand{min-width:unset}.brand-sub{display:none}.main-nav{justify-content:center}.nav-btn{padding:0 9px;font-size:10px}.top-actions .demo-status{display:none}.content{padding:23px 17px 45px}.layout-studio{grid-template-columns:230px minmax(0,1fr)}.analytics-grid{grid-template-columns:repeat(2,1fr)}.location-layout,.analytics-layout{grid-template-columns:1fr}.map-card{min-height:unset}.schematic-map{height:380px}}
+  @media(max-width:650px){.topbar{height:auto;min-height:66px;padding:10px 13px;flex-wrap:wrap;gap:8px}.brand{flex:1}.brand-mark{width:34px;height:34px}.main-nav{order:3;width:100%;justify-content:flex-start;overflow:auto;border-top:1px solid var(--line);padding-top:7px}.nav-btn{white-space:nowrap;height:34px}.top-actions{margin-left:auto}.top-actions .btn{padding:8px 10px}.content{padding:20px 12px 38px}.page-head{display:block}.head-meta{justify-content:flex-start;margin-top:13px}.layout-studio{grid-template-columns:1fr}.right-panel{grid-column:auto;display:block}.right-panel .panel-head{grid-column:auto}.right-panel .panel-body{display:block}.scene-stage{aspect-ratio:1.08;min-height:285px}.env-dock{grid-template-columns:1fr;gap:11px}.scene-caption{font-size:8px}.pitch-layout{grid-template-columns:1fr}.location-layout{display:block}.zone-list{margin-top:12px}.analytics-grid{gap:8px}.metric-card{padding:12px}.metric-card strong{font-size:18px}.analytics-layout{display:block}.analytics-layout .chart-panel+ .chart-panel{margin-top:12px}.finance-notes{grid-template-columns:1fr}.advisor-controls{grid-template-columns:1fr 1fr}.map-card{margin-bottom:13px}.schematic-map{height:330px}.footer{display:block}.footer span{display:block;margin-bottom:5px}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">P2P</div>
+      <div><div class="brand-name">Pixel<span>2</span>Public</div><div class="brand-sub">Outdoor reality studio</div></div>
+    </div>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <button class="nav-btn active" data-tab="studio">Reality studio</button>
+      <button class="nav-btn" data-tab="locations">Pune locations</button>
+      <button class="nav-btn" data-tab="economics">Campaign economics</button>
+      <button class="nav-btn" data-tab="pitch">The venture</button>
+    </nav>
+    <div class="top-actions">
+      <span class="demo-status"><i class="status-dot"></i>LOCAL PROTOTYPE</span>
+      <button class="btn btn-primary btn-small" id="openPitch">Pitch script ↗</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- REALITY STUDIO -->
+    <section class="tab-page active" id="page-studio">
+      <div class="page-head">
+        <div><div class="eyebrow">01 / Preview before production</div><h1>See the street before<br class="mobile-break"/> you spend on it.</h1><p>Bring a flat campaign into a street context. Explore placement, viewing conditions and early design risks before committing to print.</p></div>
+        <div class="head-meta"><span class="meta-pill">Selected area <strong id="headSite">FC Road · Deccan</strong></span><span class="meta-pill">Artwork <strong id="headArtwork">Pixel2Public launch</strong></span></div>
+      </div>
+
+      <div class="layout-studio">
+        <!-- LEFT CONTROLS -->
+        <aside class="panel">
+          <div class="panel-head"><span class="panel-title">Campaign setup</span><span class="panel-kicker">01—03</span></div>
+          <div class="panel-body">
+            <div class="step-label"><span class="step-no">1</span> Add your artwork</div>
+            <input type="file" id="artUpload" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+            <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload campaign artwork">
+              <div class="upload-icon">↥</div><strong>Drop artwork or browse files</strong><span>PNG · JPG · WEBP · SVG</span><div class="file-name" id="fileName">Using a sample campaign</div>
+            </div>
+            <div class="divider-label">Or start with a sample</div>
+            <div class="sample-grid" id="sampleGrid">
+              <button class="sample-card active" data-sample="tech"><span class="sample-art" id="thumb-tech"></span><span>Studio / SaaS</span></button>
+              <button class="sample-card" data-sample="coffee"><span class="sample-art" id="thumb-coffee"></span><span>Artisan coffee</span></button>
+              <button class="sample-card" data-sample="ev"><span class="sample-art" id="thumb-ev"></span><span>Electric mobility</span></button>
+            </div>
+
+            <div class="field"><div class="step-label"><span class="step-no">2</span> Choose a Pune context</div>
+              <select class="select" id="siteSelect">
+                <option value="fc">FC Road · Deccan</option><option value="hinjewadi">Hinjewadi · IT Park</option><option value="sbroad">Senapati Bapat Road</option><option value="kp">Koregaon Park</option><option value="swargate">Swargate interchange</option><option value="viman">Viman Nagar</option><option value="baner">Baner · Balewadi Phata</option>
+              </select>
+              <div class="site-hint" id="siteHint">Youth-facing retail and education corridor. Illustrative context profile.</div>
+            </div>
+
+            <div class="field">
+              <div class="step-label"><span class="step-no">3</span> Viewing perspective</div>
+              <div class="camera-list" id="cameraList"><button class="camera-btn active" data-camera="driver">↗ Driver · 50 km/h</button><button class="camera-btn" data-camera="pedestrian">◎ Pedestrian · 20 m</button><button class="camera-btn" data-camera="front">▣ Frontal view</button><button class="camera-btn" data-camera="wide">⌖ Wide context</button></div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- CENTRAL SCENE -->
+        <section class="panel scene-panel">
+          <div class="scene-top">
+            <div class="scene-label"><strong>Street preview</strong><span id="sceneLocation">Pune / FC Road</span></div>
+            <span class="live-tag">ILLUSTRATIVE 2.5D SCENE</span>
+          </div>
+          <div class="scene-stage" id="sceneStage">
+            <svg id="sceneSvg" viewBox="0 0 1000 570" role="img" aria-label="Illustrative urban street scene with campaign billboard preview"></svg>
+            <div class="scene-overlay"><span class="accent">PREVIEW MODE</span><span id="overlayTime">MIDDAY / CLEAR</span></div>
+          </div>
+          <div class="scene-caption"><span><strong id="captionSite">FC Road · Deccan</strong> <span id="captionSize">/ Standard roadside format</span></span><span id="captionCamera">Driver point of view · 50 km/h</span></div>
+          <div class="env-dock">
+            <div>
+              <div class="env-title"><span>☼ Light & time of day</span><em id="timeValue">12:00 PM</em></div>
+              <input type="range" id="timeSlider" min="5" max="23" step="0.5" value="12" />
+              <div class="preset-row"><button class="chip" data-time="7">Sunrise</button><button class="chip active" data-time="12">Noon glare</button><button class="chip" data-time="17.5">Golden hour</button><button class="chip" data-time="21">Night</button></div>
+            </div>
+            <div>
+              <div class="env-title"><span>☂ Weather intensity</span><em id="rainValue">Clear · 0%</em></div>
+              <input type="range" id="rainSlider" min="0" max="100" step="5" value="0" />
+              <div class="preset-row"><button class="chip active" data-rain="0">Clear</button><button class="chip" data-rain="35">Drizzle</button><button class="chip" data-rain="85">Monsoon</button><button class="chip" data-rain="100">Heavy rain</button></div>
+            </div>
+          </div>
+          <div class="run-row"><div class="run-note"><strong>Local preview engine</strong><br/>Updates a visual scenario and rule-based indicators in this browser.</div><button class="btn btn-primary run-btn" id="runAnalysis">Run condition check&nbsp; ↗</button></div>
+        </section>
+
+        <!-- RIGHT DIAGNOSTICS -->
+        <aside class="panel right-panel">
+          <div class="panel-head"><span class="panel-title">Visibility diagnostics</span><span class="panel-kicker">LIVE MODEL</span></div>
+          <div class="panel-body">
+            <div>
+              <p class="score-intro">Directional indicators respond to the selected artwork and viewing conditions. They are heuristic demo scores, not field measurements.</p>
+              <div class="score-wrap">
+                <div class="score-card"><svg class="ring" viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="31"/><circle class="ring-fg" id="ringRead" cx="40" cy="40" r="31" stroke-dasharray="194.78" stroke-dashoffset="39"/><text class="ring-value" id="readScore" x="40" y="46" text-anchor="middle">80</text></svg><div class="score-name">Readability</div><small>Contrast & glance</small></div>
+                <div class="score-card"><svg class="ring" viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="31"/><circle class="ring-fg" id="ringImpact" cx="40" cy="40" r="31" stroke="#80c6d0" stroke-dasharray="194.78" stroke-dashoffset="21"/><text class="ring-value" id="impactScore" x="40" y="46" text-anchor="middle">89</text></svg><div class="score-name">Visual impact</div><small>Scale & placement</small></div>
+              </div>
+            </div>
+            <div>
+              <div class="subhead">Condition breakdown</div>
+              <div class="bar-item"><div class="bar-meta"><span>Headline contrast</span><span id="contrastValue">86 / 100</span></div><div class="bar-track"><div class="bar-fill" id="contrastBar" style="width:86%"></div></div></div>
+              <div class="bar-item"><div class="bar-meta"><span>Viewing distance</span><span id="distanceValue">78 / 100</span></div><div class="bar-track"><div class="bar-fill" id="distanceBar" style="width:78%"></div></div></div>
+              <div class="bar-item"><div class="bar-meta"><span>Weather resilience</span><span id="weatherValue">94 / 100</span></div><div class="bar-track"><div class="bar-fill" id="weatherBar" style="width:94%"></div></div></div>
+              <div class="insight"><div class="insight-title">Design advisor · Preview note</div><p id="advisorText">Your headline has a clear hierarchy. Check secondary copy at a longer viewing distance before approving the final artwork.</p></div>
+            </div>
+            <div class="method-note">Method note: simplified front-end rules react to time, rain and camera preset. No live weather, computer vision, traffic feed or verified site photograph is connected.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- LOCATIONS -->
+    <section class="tab-page" id="page-locations">
+      <div class="page-head"><div><div class="eyebrow">02 / Location planning</div><h1>Find the right context<br/>for the campaign.</h1><p>Explore the Pune corridors used in the venture concept. Choose a planning zone to load its illustrative street scenario into the studio.</p></div><div class="head-meta"><span class="meta-pill">Coverage <strong>7 Pune zones</strong></span><span class="meta-pill">Data type <strong>Concept map</strong></span></div></div>
+      <div class="location-layout">
+        <div class="panel map-card">
+          <div class="map-head"><div><div class="panel-title">Pune corridor map</div><div class="panel-kicker" style="margin-top:4px">Schematic · not to scale</div></div><span class="live-tag">PLANNING VIEW</span></div>
+          <div class="schematic-map">
+            <svg viewBox="0 0 900 560" role="img" aria-label="Schematic Pune map marking seven billboard planning corridors">
+              <defs><pattern id="mapGrid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#34414a" stroke-width="1" opacity=".42"/></pattern></defs>
+              <rect width="900" height="560" fill="#18232b"/><rect width="900" height="560" fill="url(#mapGrid)"/>
+              <path d="M-30 390 C120 335 210 430 340 365 S570 300 940 375" stroke="#32414a" stroke-width="27" fill="none"/><path d="M-30 390 C120 335 210 430 340 365 S570 300 940 375" stroke="#75838b" stroke-width="2" stroke-dasharray="14 13" fill="none" opacity=".7"/>
+              <path d="M95 -30 C160 95 145 190 240 265 S420 390 495 590" stroke="#34434c" stroke-width="23" fill="none"/><path d="M95 -30 C160 95 145 190 240 265 S420 390 495 590" stroke="#76838b" stroke-width="1.5" stroke-dasharray="12 13" fill="none" opacity=".7"/>
+              <path d="M455 -30 C415 100 520 170 585 260 S690 395 760 590" stroke="#33424b" stroke-width="19" fill="none"/><path d="M455 -30 C415 100 520 170 585 260 S690 395 760 590" stroke="#75838b" stroke-width="1.5" stroke-dasharray="11 12" fill="none" opacity=".6"/>
+              <path d="M-20 120 C155 155 300 95 430 120 S680 210 925 125" stroke="#293842" stroke-width="12" fill="none"/><path d="M-20 120 C155 155 300 95 430 120 S680 210 925 125" stroke="#63727b" stroke-width="1.2" stroke-dasharray="8 11" fill="none" opacity=".6"/>
+              <g fill="#263a36" opacity=".72"><path d="M15 30h175v65H15zM250 18h120v68H250zM635 28h210v82H635zM700 445h160v75H700zM30 450h170v65H30zM325 440h120v70H325z"/><path d="M275 175h125v75H275zM600 165h170v80H600zM715 295h135v80H715z"/></g>
+              <g fill="#b6c2c6" opacity=".64" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.2"><text x="42" y="143">HINJEWADI</text><text x="65" y="420">BANER</text><text x="330" y="315">SHIVAJINAGAR</text><text x="395" y="175">DECCAN</text><text x="590" y="125">KOREGAON PARK</text><text x="720" y="410">VIMAN NAGAR</text><text x="220" y="510">SWARGATE</text></g>
+              <g id="mapPins"></g>
+              <g transform="translate(340 245)"><rect x="0" y="0" width="165" height="43" rx="8" fill="#111a20" stroke="#c5ef67" stroke-opacity=".45"/><text x="12" y="17" font-size="9" fill="#c5ef67" font-family="Arial" font-weight="700">PUNE URBAN CORE</text><text x="12" y="31" font-size="9" fill="#a4b1b5" font-family="Arial">Concept coverage area</text></g>
+            </svg>
+            <div class="map-legend"><i></i> Planning zones <i style="background:#80c6d0"></i> Selected area</div>
+          </div>
+        </div>
+        <div>
+          <div class="zone-list" id="zoneList"></div>
+          <div class="advisor-card">
+            <h3>Location matchmaker</h3><p>Choose an objective and a working monthly media budget. The local rules will suggest one of the seven planning zones.</p>
+            <div class="advisor-controls">
+              <div class="field"><label for="objectiveSelect">Campaign objective</label><select id="objectiveSelect" class="select"><option value="youth">Youth & retail</option><option value="tech">B2B / technology</option><option value="premium">Premium positioning</option><option value="reach">Broad commuter reach</option></select></div>
+              <div class="field"><label for="budgetSelect">Indicative budget</label><select id="budgetSelect" class="select"><option value="100000">Up to ₹1 lakh</option><option value="140000" selected>₹1–1.5 lakh</option><option value="200000">₹1.5–2 lakh</option></select></div>
+            </div>
+            <button class="btn btn-primary" id="matchLocation" style="width:100%;margin-top:12px">Find a matching zone ↗</button>
+            <div class="recommendation" id="recommendation"><strong id="recommendTitle">Suggested planning zone</strong><p id="recommendText"></p><button class="btn btn-small" id="loadRecommendation" style="margin-top:9px">Load into studio</button></div>
+          </div>
+        </div>
+      </div>
+      <p class="footnote">Important: these are illustrative planning zones compiled from the venture concept. They are not live billboard inventory, operator-confirmed availability, audited audience counts, traffic measurements, or rate quotations. Confirm all site facts with the media owner before making a purchase decision.</p>
+    </section>
+
+    <!-- ECONOMICS -->
+    <section class="tab-page" id="page-economics">
+      <div class="page-head"><div><div class="eyebrow">03 / Value & financial model</div><h1>Make the cost of<br/>guesswork visible.</h1><p>Estimate the value of a pre-print check, then explore the venture’s Year 1 subscription model and break-even path.</p></div><div class="head-meta"><span class="meta-pill">Primary offer <strong>Agency Pro</strong></span><span class="meta-pill">Currency <strong>INR ₹</strong></span></div></div>
+      <div class="analytics-grid">
+        <div class="metric-card"><span>Monthly agency plan</span><strong>₹4,999</strong><small>Per agency · up to 3 seats</small></div>
+        <div class="metric-card"><span>Year 1 projected revenue</span><strong>₹12.15L</strong><small>243 subscription-months</small></div>
+        <div class="metric-card"><span>Projected gross margin</span><strong>85.0%</strong><small>₹10.33L gross profit</small></div>
+        <div class="metric-card"><span>Projected net profit</span><strong>₹4.06L</strong><small>33.4% net margin</small></div>
+      </div>
+      <div class="analytics-layout">
+        <div class="chart-panel">
+          <div class="chart-head"><div><h3>Campaign waste calculator</h3><p>Adjust assumptions to estimate potential savings from an early design check.</p></div><span class="live-tag">INTERACTIVE</span></div>
+          <div class="calc-grid">
+            <div class="calc-field"><label for="spendInput">Campaign production + media spend</label><input id="spendInput" type="number" min="0" step="5000" value="100000" /><span>₹ INR</span></div>
+            <div class="calc-field"><label for="riskInput">Share exposed to avoidable rework</label><input id="riskInput" type="number" min="0" max="100" step="1" value="10" /><span>Percent of campaign spend</span></div>
+            <div class="calc-field"><label for="reductionInput">Reduction through pre-check</label><input id="reductionInput" type="number" min="0" max="100" step="1" value="30" /><span>Assumed reduction in risk</span></div>
+            <div class="calc-field"><label>Pixel2Public subscription</label><input value="₹4,999" readonly /><span>Per agency / month</span></div>
+          </div>
+          <div class="savings-result"><div><span>Estimated avoidable cost prevented</span><br/><strong id="savingsValue">₹3,000</strong></div><div style="text-align:right"><span>Illustrative net value after 1 month</span><br/><strong id="netValue">−₹1,999</strong></div></div>
+          <p class="footnote">This is a scenario calculator, not a guaranteed saving or measured product outcome. It assumes the selected reduction applies to the spend at risk and excludes taxes, financing, and indirect costs.</p>
+        </div>
+        <div class="chart-panel">
+          <div class="chart-head"><div><h3>Year 1 revenue trajectory</h3><p>Monthly subscription revenue in the launch model.</p></div><span class="live-tag">12 MONTHS</span></div>
+          <svg class="chart-svg" viewBox="0 0 560 290" role="img" aria-label="Bar chart of monthly projected revenue from 50 thousand to 175 thousand rupees">
+            <g stroke="#34404a" stroke-width="1"><path d="M48 34H535M48 91H535M48 148H535M48 205H535M48 262H535" opacity=".75"/></g>
+            <g fill="#84919b" font-size="10" font-family="Arial"><text x="5" y="38">₹1.8L</text><text x="5" y="95">₹1.4L</text><text x="5" y="152">₹1.0L</text><text x="5" y="209">₹0.5L</text><text x="22" y="266">0</text></g>
+            <g id="revenueBars"></g>
+            <g fill="#8e9aa4" font-size="9" font-family="Arial" text-anchor="middle"><text x="69" y="282">M1</text><text x="109" y="282">M2</text><text x="149" y="282">M3</text><text x="189" y="282">M4</text><text x="229" y="282">M5</text><text x="269" y="282">M6</text><text x="309" y="282">M7</text><text x="349" y="282">M8</text><text x="389" y="282">M9</text><text x="429" y="282">M10</text><text x="469" y="282">M11</text><text x="509" y="282">M12</text></g>
+          </svg>
+          <div class="finance-notes"><div class="note-tile"><strong>Month 2</strong><span>Monthly operating break-even in the projection.</span></div><div class="note-tile"><strong>Month 6</strong><span>Cumulative setup-cost recovery in the projection.</span></div></div>
+        </div>
+      </div>
+      <div class="chart-panel" style="margin-top:15px">
+        <div class="chart-head"><div><h3>Year 1 profit & loss summary</h3><p>12-month launch projection provided in the venture planning material.</p></div><span class="live-tag">MODEL VIEW</span></div>
+        <div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>Month</th><th>Active agencies / months</th><th>Revenue</th><th>Direct costs</th><th>Operating costs</th><th>Net profit</th><th>Cash flow¹</th></tr></thead><tbody id="financeRows"></tbody></table></div>
+        <p class="footnote">¹ Cumulative cash flow includes ₹50,000 in initial setup costs. Financial projections are assumptions, not audited results. The planning table rounds the ₹4,999 list price to ₹5,000 per agency for easier forecasting; this is why monthly revenue is shown in rounded ₹5,000 increments.</p>
+      </div>
+    </section>
+
+    <!-- VENTURE / PITCH -->
+    <section class="tab-page" id="page-pitch">
+      <div class="page-head"><div><div class="eyebrow">04 / The venture story</div><h1>From a flat design<br/>to a street-ready decision.</h1><p>Pixel2Public helps outdoor advertising teams pressure-test creative work in context before committing to physical production.</p></div><div class="head-meta"><span class="meta-pill">Venture <strong>Pixel to Perfect</strong></span><span class="meta-pill">Program <strong>Wadhwani Ignite</strong></span></div></div>
+      <div class="pitch-layout">
+        <article class="pitch-card"><div class="eyebrow">The problem</div><h3>A beautiful design can fail on the street.</h3><p>Designers create on a flat 2D screen. Once a billboard is printed and mounted, distance, viewing angle, glare, rain, traffic and physical obstructions can change what people actually see.</p><div class="pitch-quote">“We can approve the artwork on a laptop. But we cannot confidently predict how it will read from the road.”</div><div class="pitch-meta"><span>Flat 2D proofing</span><span>Manual mockups</span><span>Late-stage rework</span></div></article>
+        <article class="pitch-card"><div class="eyebrow">The solution</div><h3>Preview the campaign in its intended context.</h3><p>Upload an existing design, choose a Pune planning zone and explore how it may appear under different lighting and weather conditions. Use the preview to spot potential issues earlier and improve the client conversation.</p><div class="pitch-quote">“Pixel2Public turns a static artwork into a contextual decision-support preview.”</div><div class="pitch-meta"><span>Artwork upload</span><span>Location context</span><span>Visibility checks</span></div></article>
+        <article class="pitch-card"><div class="eyebrow">Who it serves</div><h3>Built around the outdoor creative workflow.</h3><p>The primary customer is a senior graphic designer or art director at an outdoor advertising agency. Agency teams can use the platform to review work, communicate trade-offs and prepare more persuasive client presentations.</p><div class="pitch-meta"><span>Creative agencies</span><span>OOH media planners</span><span>Brand teams</span></div></article>
+        <article class="pitch-card"><div class="eyebrow">What exists today</div><h3>A functional front-end concept prototype.</h3><p>This demo includes image upload, sample campaigns, interactive location selection, a stylised street preview, lighting and rain controls, heuristic visibility indicators and a savings calculator.</p><p style="color:#e8c58f">Advanced computer vision, true 3D reconstruction, live weather, verified billboard inventory and operator booking integrations are future development work—not connected in this prototype.</p></article>
+      </div>
+      <div class="pitch-card" style="margin-top:15px">
+        <div class="eyebrow">50-second sales pitch · Activity 8.3</div><h3>Talk track for a creative director</h3>
+        <div class="timeline">
+          <div class="timeline-row"><b>00:00–00:12</b><p>As graphic designers, we spend days perfecting a billboard campaign on a flat 2D screen. But once it’s printed and mounted 40 feet in the air, harsh sunlight, shadows, traffic speed and roadside trees can affect readability—leaving clients unhappy and agencies facing costly reprints.</p></div>
+          <div class="timeline-row"><b>00:12–00:28</b><p>That’s why we built Pixel2Public, an AI-powered billboard reality simulator. Upload your 2D artwork and select a target city location. The concept is to generate a contextual street preview and explore lighting, distance readability and roadside obstructions.</p></div>
+          <div class="timeline-row"><b>00:28–00:42</b><p>You can spot potential visual flaws before spending on printing, present a more convincing preview to clients and reduce hours spent manually warping perspective mockups.</p></div>
+          <div class="timeline-row"><b>00:42–00:52</b><p>Don’t let your next outdoor campaign be a high-stakes gamble. Preview your design in context with Pixel2Public and make the next production decision with more confidence.</p></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="copyPitch">Copy 50-second script</button><button class="btn" id="backToStudio">Open the live demo ↗</button></div>
+      </div>
+      <p class="footnote">The sales pitch is a proposed product promise. The current prototype demonstrates the front-end workflow and illustrative visualisation; it does not yet deliver validated AI-generated 3D simulations.</p>
+    </section>
+
+    <footer class="footer"><span>PIXEL2PUBLIC · PIXEL TO PERFECT</span><span>Entrepreneurship Skills · MIT Academy of Engineering / Wadhwani Foundation Ignite</span><span>Single-file interactive prototype</span></footer>
+  </main>
+</div>
+
+<!-- PITCH MODAL -->
+<div class="modal-backdrop" id="pitchModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Sales pitch · 50 seconds</h3><button class="close-btn" id="closePitch" aria-label="Close">×</button></div>
+    <div class="modal-body">
+      <div class="script-segment"><b>00:00–00:12 · THE PROBLEM</b>As graphic designers, we spend days perfecting a billboard campaign on a flat 2D screen. But once it’s printed and mounted 40 feet in the air, harsh sunlight, shadows, traffic speed and roadside trees can affect readability—leaving clients unhappy and agencies facing costly reprints.</div>
+      <div class="script-segment"><b>00:12–00:28 · THE SOLUTION</b>That’s why we built Pixel2Public, an AI-powered billboard reality simulator. Upload your 2D artwork and select a target city location. The concept is to generate a contextual street preview and explore lighting, distance readability and roadside obstructions.</div>
+      <div class="script-segment"><b>00:28–00:42 · THE BENEFIT</b>You can spot potential visual flaws before spending on printing, present a more convincing preview to clients and reduce hours spent manually warping perspective mockups.</div>
+      <div class="script-segment"><b>00:42–00:52 · THE CTA</b>Don’t let your next outdoor campaign be a high-stakes gamble. Preview your design in context with Pixel2Public and make the next production decision with more confidence.</div>
+    </div>
+    <div class="modal-actions"><button class="btn" id="copyModalPitch">Copy script</button><button class="btn btn-primary" id="donePitch">Done</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+  const sites = {
+    fc:{id:'fc',name:'FC Road · Deccan',area:'Fergusson College Road, Deccan Gymkhana',category:'Youth & retail',hint:'Youth-facing retail and education corridor. Illustrative context profile.',size:'Standard roadside format',note:'A youth and retail-oriented campaign context. Review the headline at a fast roadside glance.',x:416,y:176,icon:'◈'},
+    hinjewadi:{id:'hinjewadi',name:'Hinjewadi · IT Park',area:'Rajiv Gandhi Infotech Park, Phase 1',category:'Technology',hint:'Corporate commute and technology-sector audience hypothesis.',size:'Wide overhead format',note:'A technology and B2B context. Prioritise one short message and a distinctive brand cue.',x:165,y:115,icon:'⌘'},
+    sbroad:{id:'sbroad',name:'Senapati Bapat Road',area:'Shivajinagar / SB Road corridor',category:'Premium',hint:'Premium commercial corridor. Audience profile is a planning hypothesis.',size:'Standard roadside format',note:'A premium positioning context. High contrast and restrained copy can support a quick read.',x:360,y:300,icon:'✧'},
+    kp:{id:'kp',name:'Koregaon Park',area:'North Main Road, Koregaon Park',category:'Lifestyle',hint:'Lifestyle, dining and premium retail context hypothesis.',size:'Compact premium format',note:'An evening-led lifestyle context. Check how the artwork holds at lower light levels.',x:644,y:183,icon:'✦'},
+    swargate:{id:'swargate',name:'Swargate interchange',area:'Satara Road / Shivaji Road interchange',category:'Commuter reach',hint:'High-volume transit context hypothesis; no live traffic feed is connected.',size:'Large interchange format',note:'A broad-reach context. Keep the message direct and test legibility from a moving vehicle.',x:280,y:438,icon:'⇄'},
+    viman:{id:'viman',name:'Viman Nagar',area:'Ahmednagar Road / Phoenix Marketcity area',category:'Retail & travel',hint:'Retail and airport-corridor context hypothesis.',size:'Wide roadside format',note:'A retail and travel context. A clear product visual and short offer may help recognition.',x:750,y:376,icon:'◇'},
+    baner:{id:'baner',name:'Baner · Balewadi Phata',area:'Baner Road, west Pune',category:'Technology & lifestyle',hint:'Commercial and residential growth corridor context hypothesis.',size:'Standard roadside format',note:'A mixed technology and lifestyle context. Establish the core message in the first visual beat.',x:95,y:420,icon:'⌂'}
+  };
+  const state = {site:'fc',sample:'tech',artworkName:'Pixel2Public launch',artworkUrl:null,time:12,rain:0,camera:'driver',read:80,impact:89};
+
+  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function artSVG(kind){
+    if(kind==='coffee') return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#d4a36a"/><stop offset="1" stop-color="#6a3f2c"/></linearGradient></defs><rect width="800" height="300" fill="#f1dfc4"/><rect x="18" y="18" width="764" height="264" rx="16" fill="url(#g)"/><circle cx="650" cy="140" r="98" fill="#f0d7b3"/><circle cx="650" cy="140" r="72" fill="#573725"/><path d="M605 140c30-36 65-36 90 0-25 36-60 36-90 0z" fill="#d8b17c"/><path d="M625 102q25 15 0 34t0 38" fill="none" stroke="#f4e4ce" stroke-width="8" stroke-linecap="round"/><text x="62" y="91" fill="#fff4e2" font-size="25" font-family="Arial" font-weight="700" letter-spacing="7">KP ROASTERS</text><text x="58" y="190" fill="#fff" font-size="69" font-family="Arial" font-weight="900">GOOD</text><text x="58" y="249" fill="#fff" font-size="69" font-family="Arial" font-weight="900">MORNINGS.</text><rect x="590" y="245" width="128" height="25" rx="12" fill="#fff1dc"/><text x="654" y="262" fill="#563725" text-anchor="middle" font-size="13" font-family="Arial" font-weight="700">BREW LOCAL</text></svg>`;
+    if(kind==='ev') return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300"><defs><linearGradient id="e" x2="1" y2="1"><stop stop-color="#102d39"/><stop offset="1" stop-color="#1b6470"/></linearGradient></defs><rect width="800" height="300" fill="url(#e)"/><circle cx="655" cy="110" r="108" fill="#bceef0" opacity=".13"/><path d="M0 260L280 105l180 155 160-112 180 125v27H0z" fill="#153b45"/><path d="M495 186l90-49 83 9 45 38-15 30H475z" fill="#d4f4ed"/><circle cx="535" cy="221" r="24" fill="#10232a" stroke="#88d5d1" stroke-width="8"/><circle cx="675" cy="221" r="24" fill="#10232a" stroke="#88d5d1" stroke-width="8"/><text x="57" y="76" font-family="Arial" font-size="23" font-weight="700" letter-spacing="7" fill="#c4f5e9">VOLTRIDE</text><text x="55" y="156" font-family="Arial" font-size="71" font-weight="900" fill="#fff">MOVE</text><text x="55" y="224" font-family="Arial" font-size="71" font-weight="900" fill="#c5ef67">CLEAN.</text><text x="60" y="270" font-family="Arial" font-size="17" fill="#d5ebeb">THE CITY IS YOURS.</text></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300"><defs><linearGradient id="t" x2="1" y2="1"><stop stop-color="#172a33"/><stop offset="1" stop-color="#263e49"/></linearGradient></defs><rect width="800" height="300" fill="url(#t)"/><circle cx="670" cy="145" r="105" fill="#c5ef67" opacity=".13"/><path d="M500 300l90-140 65 48 50-90 95 182z" fill="#314d55"/><path d="M590 160l64 48 50-90" fill="none" stroke="#c5ef67" stroke-width="9" stroke-linecap="round"/><text x="58" y="76" fill="#c5ef67" font-size="24" font-family="Arial" font-weight="700" letter-spacing="7">PIXEL2PUBLIC</text><text x="54" y="166" fill="#fff" font-size="77" font-family="Arial" font-weight="900">DON'T</text><text x="54" y="237" fill="#fff" font-size="77" font-family="Arial" font-weight="900">PRINT <tspan fill="#c5ef67">BLIND.</tspan></text><text x="60" y="276" fill="#b7c5ca" font-size="15" font-family="Arial" letter-spacing="2">SEE IT IN CONTEXT FIRST</text></svg>`;
+  }
+  function dataUri(svg){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+  function setArtwork(url,name){state.artworkUrl=url;state.artworkName=name;$('#headArtwork').textContent=name;$('#fileName').textContent=name;renderScene();updateDiagnostics();}
+  function timeLabel(t){const h=Math.floor(t)%24,m=(t%1)*60,ap=h>=12?'PM':'AM',hh=h%12||12;return `${hh}:${String(Math.round(m)).padStart(2,'0')} ${ap}`}
+  function renderScene(){
+    const site=sites[state.site],night=state.time<6.6||state.time>19.2,sunset=state.time>=16&&state.time<=19.2,sunrise=state.time>=5&&state.time<8;
+    const skyTop=night?'#111b2b':sunset?'#594d54':sunrise?'#8d8076':'#63808d';
+    const skyBottom=night?'#29384a':sunset?'#d28c68':sunrise?'#e3ad7d':'#bbbea9';
+    const sunX=state.time<12?235:765, sunY=night?105:sunset?150:105;
+    const lightOpacity=night?0.25:sunset?0.6:0.9;
+    const rain=state.rain;
+    const cam=state.camera;
+    const scale=cam==='pedestrian'?1.11:cam==='front'?1.04:cam==='wide'?.88:1;
+    const skew=cam==='front'?0:cam==='pedestrian'?-3:cam==='wide'?-8:-5;
+    const billboardX=cam==='wide'?330:305, billboardW=cam==='wide'?370:420;
+    const art=state.artworkUrl||dataUri(artSVG(state.sample));
+    let streaks='';for(let i=0;i<42;i++){const x=(i*83+29)%1000,y=(i*137+17)%570;streaks+=`<path d="M${x} ${y}l-7 ${18+((i*7)%15)}" stroke="#cde3eb" stroke-width="1.3" opacity="${(rain/100)*.28}"/>`;}
+    const carColor=['#b5b7ae','#c7a16d','#587d83'];
+    const cars=[0,1,2].map((v)=>{const x=105+v*355+(state.rain?10:0),y=450+v*22;return `<g transform="translate(${x} ${y}) scale(${v===2?.78:1})"><ellipse cx="70" cy="42" rx="91" ry="13" fill="#080c10" opacity=".35"/><path d="M10 26l19-28q7-9 21-9h53q17 0 28 15l17 22 8 5v27H0V34z" fill="${carColor[v]}" stroke="#202932" stroke-width="4"/><path d="M38 -3h60q11 0 18 11l11 17H22z" fill="#263c48"/><circle cx="35" cy="52" r="14" fill="#11171d" stroke="#68737a" stroke-width="5"/><circle cx="125" cy="52" r="14" fill="#11171d" stroke="#68737a" stroke-width="5"/><rect x="3" y="26" width="12" height="7" rx="2" fill="#f7ddb0"/></g>`}).join('');
+    $('#sceneSvg').innerHTML=`<defs>
+      <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="${skyTop}"/><stop offset="1" stop-color="${skyBottom}"/></linearGradient>
+      <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4a5155"/><stop offset="1" stop-color="#151a20"/></linearGradient>
+      <linearGradient id="billboardFrame" x2="0" y2="1"><stop stop-color="#43515b"/><stop offset="1" stop-color="#101820"/></linearGradient>
+      <radialGradient id="sunGlow"><stop stop-color="#fff2c7" stop-opacity=".8"/><stop offset="1" stop-color="#fff2c7" stop-opacity="0"/></radialGradient>
+      <clipPath id="boardClip"><path d="M${billboardX+24} 104 L${billboardX+billboardW-12} 94 L${billboardX+billboardW-12} 238 L${billboardX+24} 248Z"/></clipPath>
+      <filter id="boardShadow"><feGaussianBlur stdDeviation="12"/></filter>
+    </defs>
+    <rect width="1000" height="570" fill="url(#sky)"/>
+    <circle cx="${sunX}" cy="${sunY}" r="140" fill="url(#sunGlow)" opacity="${lightOpacity}"/>
+    ${night?`<g fill="#f5edcf" opacity=".65">${Array.from({length:34},(_,i)=>`<circle cx="${(i*127+41)%1000}" cy="${(i*59+23)%185}" r="${i%3===0?1.7:1}"/>`).join('')}</g>`:''}
+    <path d="M0 290L0 250 65 250 65 205 123 205 123 260 180 260 180 222 240 222 240 282 310 282 310 233 350 233 350 274 402 274 402 220 448 220 448 280 505 280 505 240 550 240 550 267 606 267 606 206 668 206 668 270 730 270 730 230 788 230 788 280 850 280 850 214 901 214 901 266 1000 266 1000 376 0 376Z" fill="#34444b" opacity=".75"/>
+    <g fill="#1e3039" opacity=".93"><path d="M5 264h82v112H5zM98 226h79v150H98zM194 278h94v98h-94zM305 251h60v125h-60zM390 245h70v131h-70zM495 277h75v99h-75zM610 232h85v144h-85zM720 269h93v107h-93zM835 236h100v140H835z"/></g>
+    <g fill="#9ab1b5" opacity=".24">${Array.from({length:54},(_,i)=>{const x=(i*71+11)%970,y=285+((i*19)%73);return `<rect x="${x}" y="${y}" width="7" height="10" rx="1"/>`}).join('')}</g>
+    <path d="M0 365Q250 345 510 366T1000 350V570H0Z" fill="#26343a"/>
+    <path d="M0 409L1000 392V570H0Z" fill="url(#road)"/>
+    <path d="M0 420L1000 405" stroke="#aeb3a9" stroke-opacity=".35" stroke-width="3"/>
+    <path d="M0 518L1000 492" stroke="#d2c7a5" stroke-opacity=".48" stroke-width="3" stroke-dasharray="62 48"/>
+    <path d="M0 568L480 435 525 435 1000 565" fill="#151b21" opacity=".35"/>
+    <!-- gantry supports and billboard -->
+    <ellipse cx="510" cy="383" rx="260" ry="20" fill="#080d11" opacity=".22" filter="url(#boardShadow)"/>
+    <path d="M352 232L365 232 389 405 370 405Z M654 222L670 222 656 405 638 405Z" fill="url(#billboardFrame)" stroke="#58656c" stroke-width="3"/>
+    <path d="M360 257L658 247M365 295L654 285M370 335L650 325M376 375L646 365" stroke="#849097" stroke-opacity=".6" stroke-width="4"/>
+    <path d="M368 252L653 374M655 251L371 374M365 295L650 325M650 285L370 335" stroke="#65727a" stroke-width="2" opacity=".75"/>
+    <path d="M${billboardX+10} 91L${billboardX+billboardW} 80L${billboardX+billboardW} 250L${billboardX+10} 261Z" fill="#0a1016" stroke="#708087" stroke-width="7"/>
+    <path d="M${billboardX+20} 99L${billboardX+billboardW-5} 89L${billboardX+billboardW-5} 242L${billboardX+20} 252Z" fill="#e9edf0" opacity=".18"/>
+    <image href="${art}" x="${billboardX+24}" y="94" width="${billboardW-36}" height="155" preserveAspectRatio="none" clip-path="url(#boardClip)" style="filter:${night?'brightness(.75) saturate(.8)':sunset?'saturate(.9) sepia(.13)':'none'}"/>
+    <path d="M${billboardX+24} 104L${billboardX+billboardW-12} 94L${billboardX+billboardW-12} 238L${billboardX+24} 248Z" fill="none" stroke="#c8d1d2" stroke-opacity=".65" stroke-width="2"/>
+    ${night?`<g><path d="M${billboardX+88} 78l-16 -26h24l-6 26M${billboardX+billboardW/2} 70l-16 -27h24l-6 27M${billboardX+billboardW-88} 73l-16 -26h24l-6 26" fill="#d4c9a5"/><path d="M${billboardX+90} 80L${billboardX+100} 133M${billboardX+billboardW/2} 73L${billboardX+billboardW/2} 130M${billboardX+billboardW-88} 76L${billboardX+billboardW-80} 132" stroke="#ffeab3" stroke-width="24" opacity=".11"/></g>`:''}
+    <!-- foliage, wires and roadside details -->
+    <g fill="#1c3431"><path d="M0 332q28-54 65-38 20-65 62-20 39-56 76-9 15 44-14 77H0z"/><path d="M829 348q35-74 75-34 33-68 70-19 25 17 26 57z"/><path d="M902 300q-7-64 6-114h9q6 65 3 114z"/></g>
+    <g stroke="#192b28" stroke-width="5" fill="none"><path d="M858 210Q925 170 1000 202"/><path d="M868 228Q936 191 1000 221"/></g>
+    <g fill="#52645e"><path d="M44 350v90h9v-90zM49 350q-33-34-40-7 21 28 40 17M49 354q24-38 47-19-10 26-47 31"/><path d="M927 326v87h8v-87zM931 329q-33-38-47-14 22 31 47 25M931 337q23-39 52-19-14 27-52 32"/></g>
+    ${cars}
+    ${rain>5?`<rect width="1000" height="570" fill="#9db9c8" opacity="${rain/100*.17}"/>${streaks}<path d="M0 435Q240 416 500 432T1000 413V570H0Z" fill="#91b2bf" opacity="${rain/100*.08}"/>`:''}
+    ${rain>70?`<rect width="1000" height="570" fill="#b9cbd0" opacity="${(rain-70)/100*.25}"/>`:''}
+    <rect width="1000" height="570" fill="#081016" opacity="${night?.26:0}"/>
+    <rect x="14" y="14" width="972" height="542" rx="7" fill="none" stroke="#f1f4f4" stroke-opacity=".1"/>
+    `;
+    $('#headSite').textContent=site.name;$('#sceneLocation').textContent='Pune / '+site.name;$('#captionSite').textContent=site.name;$('#captionSize').textContent='/ '+site.size;$('#captionCamera').textContent=cameraLabel();
+    $('#overlayTime').textContent=(night?'NIGHT':sunset?'GOLDEN HOUR':sunrise?'SUNRISE':'DAYLIGHT')+' / '+(rain>70?'HEAVY RAIN':rain>25?'WET CONDITIONS':'CLEAR');
+  }
+  function cameraLabel(){return ({driver:'Driver point of view · 50 km/h',pedestrian:'Pedestrian view · approx. 20 m',front:'Frontal artwork check',wide:'Wide streetscape context'})[state.camera]}
+  function updateDiagnostics(){
+    const timePenalty=(state.time<7||state.time>19)?(state.time>20?15:8):(state.time>15&&state.time<18?3:0);
+    const rainPenalty=Math.round(state.rain*.22);
+    const cameraBonus=state.camera==='front'?5:state.camera==='pedestrian'?2:state.camera==='wide'?-5:0;
+    const siteBonus=state.site==='swargate'||state.site==='viman'? -3:0;
+    const read=Math.max(28,Math.min(98,82-timePenalty-rainPenalty+cameraBonus+siteBonus));
+    const impact=Math.max(35,Math.min(98,90-(state.rain*.08)-(timePenalty*.25)+(state.camera==='wide'?3:0)));
+    const contrast=Math.max(25,Math.min(98,88-timePenalty-rainPenalty*.65));
+    const distance=Math.max(25,Math.min(98,78+cameraBonus-(state.camera==='pedestrian'? -5:0)));
+    const weather=Math.max(20,Math.min(98,96-Math.round(state.rain*.55)-(state.time>19?4:0)));
+    state.read=read;state.impact=impact;
+    $('#readScore').textContent=read;$('#impactScore').textContent=impact;
+    $('#ringRead').style.strokeDashoffset=194.78*(1-read/100);$('#ringImpact').style.strokeDashoffset=194.78*(1-impact/100);
+    $('#contrastValue').textContent=contrast+' / 100';$('#contrastBar').style.width=contrast+'%';
+    $('#distanceValue').textContent=distance+' / 100';$('#distanceBar').style.width=distance+'%';
+    $('#weatherValue').textContent=weather+' / 100';$('#weatherBar').style.width=weather+'%';
+    let msg='Your headline has a clear hierarchy. Check secondary copy at a longer viewing distance before approving the final artwork.';
+    if(state.rain>70)msg='Heavy rain reduces visual separation in this preview. Strengthen contrast and avoid relying on fine text or subtle colour differences.';
+    else if(state.time>19||state.time<7)msg='Low-light conditions are active. Review the artwork’s brightest focal point and avoid thin type that may disappear at a glance.';
+    else if(read<65)msg='This combination creates a visibility risk in the heuristic model. Simplify the message and increase contrast before presenting a final proof.';
+    else if(state.camera==='pedestrian')msg='Pedestrian view is selected. The larger viewing time helps detail, but keep the campaign hierarchy obvious from a distance.';
+    else if(state.camera==='wide')msg='Wide context is selected. The board competes with more surrounding visual information; keep one clear focal message.';
+    $('#advisorText').textContent=msg;
+  }
+  function setSite(id){if(!sites[id])return;state.site=id;const s=sites[id];$('#siteSelect').value=id;$('#siteHint').textContent=s.hint;$('#headSite').textContent=s.name;renderScene();updateDiagnostics();$$('.zone-card').forEach(el=>el.classList.toggle('selected',el.dataset.site===id));$$('#mapPins .map-pin').forEach(el=>{el.classList.toggle('selected',el.dataset.site===id);const dot=el.querySelector('circle:nth-child(2)');if(dot)dot.setAttribute('fill',el.dataset.site===id?'#80c6d0':'#c5ef67')});}
+  function selectTab(tab){$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$$('.tab-page').forEach(p=>p.classList.toggle('active',p.id==='page-'+tab));window.scrollTo({top:0,behavior:'smooth'});}
+  $$('.nav-btn').forEach(b=>b.addEventListener('click',()=>selectTab(b.dataset.tab)));
+
+  // Samples & upload
+  ['tech','coffee','ev'].forEach(k=>{$('#thumb-'+k).innerHTML=artSVG(k)});
+  function chooseSample(k){state.sample=k;const names={tech:'Pixel2Public launch',coffee:'KP Roasters',ev:'VoltRide EV'};setArtwork(dataUri(artSVG(k)),names[k]);$$('.sample-card').forEach(c=>c.classList.toggle('active',c.dataset.sample===k));$('#fileName').textContent=names[k]+' · sample artwork';}
+  $$('.sample-card').forEach(c=>c.addEventListener('click',()=>chooseSample(c.dataset.sample)));
+  const uploadZone=$('#uploadZone'),fileInput=$('#artUpload');
+  uploadZone.addEventListener('click',()=>fileInput.click());uploadZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click()}});
+  uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag')});uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag'));uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+  fileInput.addEventListener('change',()=>{if(fileInput.files[0])loadFile(fileInput.files[0])});
+  function loadFile(file){if(!file.type.startsWith('image/')){toast('Please choose an image file.');return}if(file.size>12*1024*1024){toast('Please use an image smaller than 12 MB.');return}if(state.artworkUrl&&state.artworkUrl.startsWith('blob:'))URL.revokeObjectURL(state.artworkUrl);const u=URL.createObjectURL(file);state.sample='custom';$$('.sample-card').forEach(c=>c.classList.remove('active'));setArtwork(u,file.name);$('#fileName').textContent=file.name;toast('Artwork loaded into the street preview.');}
+
+  // Site and environment controls
+  $('#siteSelect').addEventListener('change',e=>setSite(e.target.value));
+  $$('.camera-btn').forEach(b=>b.addEventListener('click',()=>{state.camera=b.dataset.camera;$$('.camera-btn').forEach(x=>x.classList.toggle('active',x===b));renderScene();updateDiagnostics()}));
+  $('#timeSlider').addEventListener('input',e=>{state.time=+e.target.value;$('#timeValue').textContent=timeLabel(state.time);$$('[data-time]').forEach(b=>b.classList.toggle('active',+b.dataset.time===state.time));renderScene();updateDiagnostics()});
+  $$('[data-time]').forEach(b=>b.addEventListener('click',()=>{$('#timeSlider').value=b.dataset.time;$('#timeSlider').dispatchEvent(new Event('input'))}));
+  $('#rainSlider').addEventListener('input',e=>{state.rain=+e.target.value;$('#rainValue').textContent=(state.rain===0?'Clear':state.rain<50?'Drizzle':state.rain<90?'Rain':'Heavy rain')+' · '+state.rain+'%';$$('[data-rain]').forEach(b=>b.classList.toggle('active',+b.dataset.rain===state.rain));renderScene();updateDiagnostics()});
+  $$('[data-rain]').forEach(b=>b.addEventListener('click',()=>{$('#rainSlider').value=b.dataset.rain;$('#rainSlider').dispatchEvent(new Event('input'))}));
+  $('#runAnalysis').addEventListener('click',()=>{const btn=$('#runAnalysis');btn.disabled=true;btn.textContent='Checking conditions…';setTimeout(()=>{updateDiagnostics();btn.disabled=false;btn.textContent='Run condition check  ↗';toast('Preview refreshed · heuristic indicators updated.');},650)});
+
+  // Locations schematic and list
+  const zoneMeta=[['fc','FC Road / Deccan','Youth, cafés & education'],['hinjewadi','Hinjewadi IT Park','Technology & corporate commute'],['sbroad','Senapati Bapat Road','Premium commercial corridor'],['kp','Koregaon Park','Lifestyle & dining'],['swargate','Swargate interchange','Commuter / mass reach'],['viman','Viman Nagar','Retail & airport corridor'],['baner','Baner / Balewadi Phata','Technology & lifestyle']];
+  function buildZoneList(){ $('#zoneList').innerHTML=zoneMeta.map(([id,title,subtitle])=>`<div class="zone-card ${id===state.site?'selected':''}" data-site="${id}"><div class="zone-icon">${sites[id].icon}</div><div><strong>${title}</strong><span>${subtitle}</span></div><button type="button" data-load="${id}">Preview ↗</button></div>`).join('');
+    $('#zoneList').addEventListener('click',e=>{const b=e.target.closest('[data-load]');if(b){setSite(b.dataset.load);selectTab('studio');toast('Planning zone loaded into the studio.')}});
+  }
+  function buildMapPins(){const coords={fc:[416,176],hinjewadi:[165,115],sbroad:[360,300],kp:[644,183],swargate:[280,438],viman:[750,376],baner:[95,420]};$('#mapPins').innerHTML=Object.entries(coords).map(([id,[x,y]])=>`<g class="map-pin ${id===state.site?'selected':''}" data-site="${id}" transform="translate(${x} ${y})" style="cursor:pointer"><circle r="18" fill="#c5ef67" opacity=".13"/><circle r="8" fill="${id===state.site?'#80c6d0':'#c5ef67'}" stroke="#132027" stroke-width="3"/><circle r="3" fill="#132027"/><text x="14" y="4" font-size="10" font-family="Arial" fill="#f1f4f2" stroke="#17232a" stroke-width="3" paint-order="stroke">${sites[id].name.split(' · ')[0].split(' ')[0]}</text></g>`).join('');$('#mapPins').addEventListener('click',e=>{const pin=e.target.closest('[data-site]');if(pin){setSite(pin.dataset.site);toast(sites[pin.dataset.site].name+' selected.')}});}
+  buildZoneList();buildMapPins();
+  const mapObserver=new MutationObserver(()=>{$$('.map-pin').forEach(el=>el.classList.toggle('selected',el.dataset.site===state.site))});mapObserver.observe($('#mapPins'),{childList:true});
+
+  // Matchmaker (transparent rules, not AI)
+  let recommended='fc';
+  $('#matchLocation').addEventListener('click',()=>{const goal=$('#objectiveSelect').value,budget=+$('#budgetSelect').value;const order={youth:['fc','baner','viman','kp','swargate','sbroad','hinjewadi'],tech:['hinjewadi','baner','sbroad','viman','fc','kp','swargate'],premium:['kp','sbroad','viman','baner','fc','hinjewadi','swargate'],reach:['swargate','fc','hinjewadi','viman','baner','sbroad','kp']}[goal];recommended=order.find(id=>({fc:120000,hinjewadi:185000,sbroad:150000,kp:140000,swargate:95000,viman:130000,baner:135000}[id])<=budget)||order[0];const goalText={youth:'youth and retail',tech:'technology and corporate commuters',premium:'premium lifestyle positioning',reach:'broad commuter reach'}[goal];$('#recommendTitle').textContent='Suggested zone · '+sites[recommended].name;$('#recommendText').textContent='This planning rule favours '+sites[recommended].name+' for a '+goalText+' brief within the selected indicative budget. Treat this as a shortlist prompt, not an AI-verified ROI prediction.';$('#recommendation').classList.add('show');});
+  $('#loadRecommendation').addEventListener('click',()=>{setSite(recommended);selectTab('studio');toast('Suggested zone loaded.');});
+
+  // Financial projection table and chart
+  const months=[
+    ['M1',10,50000,7500,45000,-2500,-52500],['M2',11,55000,8250,45000,1750,-50750],['M3',13,65000,9750,45000,10250,-40500],['M4',14,70000,10500,52000,7500,-33000],['M5',16,80000,12000,52000,16000,-17000],['M6',18,90000,13500,52000,24500,7500],['M7',20,100000,15000,52000,33000,40500],['M8',22,110000,16500,52000,41500,82000],['M9',25,125000,18750,58000,48250,130250],['M10',28,140000,21000,58000,61000,191250],['M11',31,155000,23250,58000,73750,265000],['M12',35,175000,26250,58000,90750,355750]
+  ];
+  $('#financeRows').innerHTML=months.map(m=>`<tr><td>${m[0]}</td><td>${m[1]}</td><td>${fmt(m[2])}</td><td>${fmt(m[3])}</td><td>${fmt(m[4])}</td><td style="color:${m[5]<0?'#f08b80':'#c5ef67'}">${m[5]<0?'−':''}${fmt(Math.abs(m[5]))}</td><td>${m[6]<0?'−':''}${fmt(Math.abs(m[6]))}</td></tr>`).join('')+`<tr><td>YEAR 1</td><td>243 agency-months</td><td>${fmt(1215000)}</td><td>${fmt(182250)}</td><td>${fmt(627000)}</td><td>${fmt(405750)}</td><td>${fmt(355750)}</td></tr>`;
+  const bars=months.map((m,i)=>{const h=m[2]/180000*220,y=262-h,x=54+i*40;return `<rect x="${x}" y="${y}" width="27" height="${h}" rx="4" fill="${i===11?'#c5ef67':'#789b77'}" opacity="${i===11?1:.82}"/><rect x="${x}" y="${y-18}" width="27" height="13" rx="4" fill="#18212a" opacity="0"/><title>${m[0]}: ${fmt(m[2])}</title>`}).join('');$('#revenueBars').innerHTML=bars;
+
+  // Savings calculator
+  function updateSavings(){const spend=Math.max(0,+$('#spendInput').value||0),risk=Math.min(100,Math.max(0,+$('#riskInput').value||0)),reduction=Math.min(100,Math.max(0,+$('#reductionInput').value||0));const saving=spend*(risk/100)*(reduction/100),net=saving-4999;$('#savingsValue').textContent=fmt(saving);$('#netValue').textContent=(net<0?'−':'')+fmt(Math.abs(net));$('#netValue').style.color=net>=0?'var(--lime2)':'#e9a38d';}
+  ['spendInput','riskInput','reductionInput'].forEach(id=>$('#'+id).addEventListener('input',updateSavings));
+
+  // Pitch actions
+  const pitchText='As graphic designers, we spend days perfecting a billboard campaign on a flat 2D screen. But once it’s printed and mounted 40 feet in the air, harsh sunlight, shadows, traffic speed and roadside trees can affect readability—leaving clients unhappy and agencies facing costly reprints. That’s why we built Pixel2Public, an AI-powered billboard reality simulator. Upload your 2D artwork and select a target city location. The concept is to generate a contextual street preview and explore lighting, distance readability and roadside obstructions. You can spot potential visual flaws before spending on printing, present a more convincing preview to clients and reduce hours spent manually warping perspective mockups. Don’t let your next outdoor campaign be a high-stakes gamble. Preview your design in context with Pixel2Public and make the next production decision with more confidence.';
+  function openModal(){$('#pitchModal').classList.add('show')}function closeModal(){$('#pitchModal').classList.remove('show')}
+  $('#openPitch').addEventListener('click',openModal);$('#closePitch').addEventListener('click',closeModal);$('#donePitch').addEventListener('click',closeModal);$('#pitchModal').addEventListener('click',e=>{if(e.target===$('#pitchModal'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+  async function copyPitch(){try{await navigator.clipboard.writeText(pitchText);toast('Sales pitch copied to clipboard.')}catch(e){const ta=document.createElement('textarea');ta.value=pitchText;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Sales pitch copied.')}catch(_){toast('Clipboard unavailable in this browser.')}ta.remove()}}
+  $('#copyPitch').addEventListener('click',copyPitch);$('#copyModalPitch').addEventListener('click',copyPitch);$('#backToStudio').addEventListener('click',()=>selectTab('studio'));
+
+  let toastTimer;function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600)}
+
+  // First paint
+  chooseSample('tech');setSite('fc');$('#timeValue').textContent=timeLabel(state.time);updateDiagnostics();updateSavings();
+})();
+</script>
+</body>
+</html>
